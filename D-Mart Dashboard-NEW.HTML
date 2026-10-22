@@ -1,0 +1,1041 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D-Mart Executive Power BI Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f17;
+            color: #e2e8f0;
+        }
+
+        /* Glassmorphism Styling */
+        .glass-card {
+            background: rgba(18, 24, 38, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 210, 106, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 210, 106, 0.15);
+        }
+
+        /* Neon Accent */
+        .neon-text {
+            color: #00d26a;
+            text-shadow: 0 0 10px rgba(0, 210, 106, 0.3);
+        }
+
+        .neon-bg {
+            background-color: #00d26a;
+        }
+
+        .neon-border {
+            border-color: #00d26a;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00d26a;
+        }
+
+        /* Active tab styling */
+        .tab-btn.active {
+            background: rgba(0, 210, 106, 0.15);
+            color: #00d26a;
+            border-bottom: 2px solid #00d26a;
+        }
+
+        /* Smooth page transitions */
+        .dashboard-page {
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+
+    <!-- ========================================== -->
+    <!-- 1. LANDING PAGE / HOME SCREEN             -->
+    <!-- ========================================== -->
+    <div id="landing-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b0f17] px-4 text-center transition-all duration-500">
+        <div class="max-w-2xl w-full glass-card p-10 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
+            <!-- Background Gradient Glow -->
+            <div class="absolute -top-20 -left-20 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-60 h-60 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-widest mb-6">
+                <i class="fa-solid fa-chart-line"></i> Power BI Interactive Analytics
+            </div>
+
+            <!-- Dynamic Time-aware Greeting -->
+            <h1 id="landing-greeting" class="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-3">
+                Good Day!
+            </h1>
+            <p class="text-slate-400 text-base md:text-lg mb-8 max-w-lg mx-auto">
+                Welcome to the <span class="text-white font-semibold">D-Mart Executive Intelligence Suite</span>. Analyze revenue trends, cross-filter channel insights, and track operational metrics in real-time.
+            </p>
+
+            <button id="btn-start-dashboard" class="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold text-black bg-emerald-400 hover:bg-emerald-300 transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-emerald-500/25">
+                <span>Click here to view D-Mart dashboard</span>
+                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </button>
+
+            <div class="mt-8 pt-6 border-t border-slate-800/80 flex items-center justify-center gap-6 text-slate-500 text-xs">
+                <span><i class="fa-solid fa-bolt text-emerald-400 mr-1"></i> Recursive Cross-Filtering</span>
+                <span><i class="fa-solid fa-database text-emerald-400 mr-1"></i> 100K+ Transactions</span>
+                <span><i class="fa-solid fa-layer-group text-emerald-400 mr-1"></i> Multi-Tab Engine</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN DASHBOARD CONTAINER               -->
+    <!-- ========================================== -->
+    <div id="main-dashboard" class="flex-1 flex flex-col min-h-screen hidden">
+        
+        <!-- TOP HEADER NAVBAR -->
+        <header class="sticky top-0 z-40 bg-[#0d1117]/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                
+                <!-- Brand & Title -->
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-400 flex items-center justify-center font-black text-black text-xl shadow-lg shadow-emerald-500/20">
+                            DM
+                        </div>
+                        <div>
+                            <h2 class="font-extrabold text-lg text-white tracking-wide leading-none flex items-center gap-2">
+                                D<span class="text-emerald-400">MART</span>
+                                <span class="text-[10px] font-semibold bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">POWER BI</span>
+                            </h2>
+                            <p class="text-xs text-slate-400">Interactive Executive Intelligence</p>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Reset Trigger -->
+                    <button onclick="resetAllFilters()" class="sm:hidden text-xs text-emerald-400 hover:text-emerald-300 underline">
+                        Reset
+                    </button>
+                </div>
+
+                <!-- Global City Selector & Page Tabs -->
+                <div class="flex flex-wrap items-center justify-end gap-3 w-full sm:w-auto">
+                    <!-- City Dropdown -->
+                    <div class="relative flex-1 sm:flex-none min-w-[150px]">
+                        <select id="city-selector" onchange="handleCityChange(this.value)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer appearance-none">
+                            <option value="ALL">All Cities</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Bangalore">Bangalore</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Hyderabad">Hyderabad</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Kolkata">Kolkata</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-xs pointer-events-none"></i>
+                    </div>
+
+                    <!-- Tab Buttons -->
+                    <nav class="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-xs font-medium">
+                        <button onclick="switchTab('page1')" id="tab-page1" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                            Overview
+                        </button>
+                        <button onclick="switchTab('page2')" id="tab-page2" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                            Regional & Category
+                        </button>
+                        <button onclick="switchTab('page3')" id="tab-page3" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                            Products & Funnel
+                        </button>
+                    </nav>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- BREADCRUMB / ACTIVE FILTERS BAR -->
+        <div class="bg-slate-900/50 border-b border-slate-800/60 px-4 lg:px-8 py-2">
+            <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 text-xs">
+                <div class="flex items-center gap-2 overflow-x-auto py-0.5 no-scrollbar">
+                    <span class="text-slate-500 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-filter text-[10px]"></i> Active Filters:
+                    </span>
+                    <div id="active-filters-badges" class="flex items-center gap-1.5">
+                        <span class="text-slate-400 italic">None (Displaying Full Context)</span>
+                    </div>
+                </div>
+
+                <button onclick="resetAllFilters()" class="hidden sm:flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-medium hover:underline transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-rotate-left text-[11px]"></i> Reset All Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT BODY -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
+
+            <!-- GLOBAL KPI CARDS (UPDATED DYANMICALLY ON EVERY CROSS-FILTER) -->
+            <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Total Sales -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden transition-all duration-300">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-medium uppercase tracking-wider">Total Sales</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div id="kpi-sales" class="text-xl md:text-2xl font-bold text-white mb-1">₹0</div>
+                    <div class="text-[11px] text-emerald-400 flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-trend-up"></i> <span id="kpi-sales-sub">Filtered Revenue</span>
+                    </div>
+                </div>
+
+                <!-- Total Orders -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden transition-all duration-300">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-medium uppercase tracking-wider">Completed Orders</span>
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                    </div>
+                    <div id="kpi-orders" class="text-xl md:text-2xl font-bold text-white mb-1">0</div>
+                    <div class="text-[11px] text-blue-400 flex items-center gap-1">
+                        <i class="fa-solid fa-box-archive"></i> <span id="kpi-orders-sub">Filtered Transactions</span>
+                    </div>
+                </div>
+
+                <!-- Avg Order Value -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden transition-all duration-300">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-medium uppercase tracking-wider">Avg Order Value</span>
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                    </div>
+                    <div id="kpi-aov" class="text-xl md:text-2xl font-bold text-white mb-1">₹0</div>
+                    <div class="text-[11px] text-purple-400 flex items-center gap-1">
+                        <i class="fa-solid fa-calculator"></i> <span>Basket Size</span>
+                    </div>
+                </div>
+
+                <!-- Cancellation Rate -->
+                <div class="glass-card p-4 rounded-2xl border border-slate-800/80 relative overflow-hidden transition-all duration-300">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-medium uppercase tracking-wider">Cancellation Rate</span>
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
+                    </div>
+                    <div id="kpi-cancel" class="text-xl md:text-2xl font-bold text-white mb-1">0%</div>
+                    <div class="text-[11px] text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-shield-halved"></i> <span>Ops Health</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- PAGE 1: EXECUTIVE OVERVIEW                -->
+            <!-- ========================================== -->
+            <div id="page1" class="dashboard-page space-y-6">
+                
+                <!-- Main Combo Chart: Monthly Revenue & Order Volume -->
+                <div class="glass-card p-5 rounded-2xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-days text-emerald-400"></i> Date-Wise Sales & Order Trend
+                            </h3>
+                            <p class="text-xs text-slate-400">Click any month bar to cross-filter the entire dashboard.</p>
+                        </div>
+                        <span class="text-[11px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 font-medium self-start sm:self-auto">
+                            <i class="fa-solid fa-hand-pointer mr-1"></i> Interactive Filter
+                        </span>
+                    </div>
+
+                    <div class="h-72 w-full relative">
+                        <canvas id="chart-monthly-trend"></canvas>
+                    </div>
+
+                    <!-- Business Insight Card -->
+                    <div class="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
+                        <div class="text-emerald-400 text-base mt-0.5"><i class="fa-solid fa-lightbulb"></i></div>
+                        <div>
+                            <span class="font-semibold text-white">Power BI Insight Note:</span>
+                            December consistently spikes in store revenue due to holiday demand and festival promotional offers. Clicking March vs December highlights changing seasonal basket composition.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: Payment Methods & Channels -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Sales Channel Doughnut Chart -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-cart-flatbed text-blue-400"></i> Sales Channel Mix
+                                </h3>
+                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Cross-Filter Enabled</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">Click slices (In-Store, App, Ready Pick) to isolate channel metrics.</p>
+                            
+                            <div class="h-56 w-full relative flex items-center justify-center">
+                                <canvas id="chart-channels"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-blue-400 mt-0.5"></i>
+                            <div><strong class="text-slate-200">Takeaway:</strong> In-store purchasing dominates bulk grocery sales, while DMart Ready App adoption increases peak weekend online deliveries.</div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Pie Chart -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-wallet text-purple-400"></i> Payment Methods Split
+                                </h3>
+                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Cross-Filter Enabled</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">Click payment slices (UPI, Cards, Cash) to recalculate full context.</p>
+
+                            <div class="h-56 w-full relative flex items-center justify-center">
+                                <canvas id="chart-payments"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-purple-400 mt-0.5"></i>
+                            <div><strong class="text-slate-200">Takeaway:</strong> Digital UPI transaction volume accounts for over 45% of payments, drastically speeding up checkout counter times.</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PAGE 2: REGIONAL & CATEGORIES             -->
+            <!-- ========================================== -->
+            <div id="page2" class="dashboard-page space-y-6 hidden">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Category Sales Bar Chart -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-boxes-packing text-amber-400"></i> Category Revenue Breakdown
+                                </h3>
+                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Cross-Filter</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">Click bars to isolate categories across all cards and pages.</p>
+
+                            <div class="h-72 w-full relative">
+                                <canvas id="chart-categories"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
+                            <i class="fa-solid fa-chart-simple text-amber-400 mt-0.5"></i>
+                            <div><strong class="text-slate-200">Category Focus:</strong> Staples and Foods generate the highest volume margins, whereas Apparel & Home Appliances deliver higher AOV.</div>
+                        </div>
+                    </div>
+
+                    <!-- Regional State Sales Distribution Chart -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-map-location-dot text-emerald-400"></i> Regional State Revenue
+                                </h3>
+                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Cross-Filter</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">Click state bars to filter dashboard metrics by state territory.</p>
+
+                            <div class="h-72 w-full relative">
+                                <canvas id="chart-states"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
+                            <i class="fa-solid fa-location-dot text-emerald-400 mt-0.5"></i>
+                            <div><strong class="text-slate-200">Territory Analysis:</strong> Maharashtra leads total revenue contribution, followed by Karnataka and Telangana retail hubs.</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PAGE 3: PRODUCTS & CONVERSION FUNNEL       -->
+            <!-- ========================================== -->
+            <div id="page3" class="dashboard-page space-y-6 hidden">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Product Leaderboard -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-trophy text-yellow-400"></i> Top Performing Product Leaderboard
+                                </h3>
+                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Cross-Filter</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">Click top product items to trace specific stock line metrics.</p>
+
+                            <div class="h-72 w-full relative">
+                                <canvas id="chart-products"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
+                            <i class="fa-solid fa-award text-yellow-400 mt-0.5"></i>
+                            <div><strong class="text-slate-200">Inventory Velocity:</strong> Fortune Oil and Basmati Rice drive highest fast-moving consumer goods (FMCG) turnover rates.</div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Conversion Funnel -->
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-filter text-cyan-400"></i> Customer Journey & Conversion Funnel
+                                </h3>
+                                <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Funnel Pipeline</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">Click stage levels to cross-filter completed purchase drop-offs.</p>
+
+                            <div class="h-72 w-full relative">
+                                <canvas id="chart-funnel"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 flex items-start gap-2">
+                            <i class="fa-solid fa-users text-cyan-400 mt-0.5"></i>
+                            <div><strong class="text-slate-200">Funnel Conversion:</strong> Cart-to-Checkout conversion rates remain high at 74% due to aggressive DMart price discounts.</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. JAVASCRIPT RECURSIVE ENGINE & DATA MODEL-->
+    <!-- ========================================== -->
+    <script>
+        // --- 1. RAW TRANSACTIONAL DATASET ---
+        const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const CITIES = ['Mumbai', 'Bangalore', 'Delhi', 'Hyderabad', 'Chennai', 'Kolkata'];
+        const PAYMENTS = ['UPI', 'Credit/Debit Card', 'Cash', 'DMart Wallet'];
+        const CHANNELS = ['In-Store', 'DMart Ready App', 'Online Express'];
+        const CATEGORIES = ['Staples & FMCG', 'Dairy & Fresh', 'Home & Personal Care', 'Apparel & Footwear', 'Home Appliances'];
+
+        const PRODUCTS_BY_CAT = {
+            'Staples & FMCG': 'Fortune Sunflower Oil 5L',
+            'Dairy & Fresh': 'Amul Butter 500g',
+            'Home & Personal Care': 'Surf Excel Easy Wash 3kg',
+            'Apparel & Footwear': 'Men Cotton Polo T-Shirt',
+            'Home Appliances': 'Bajaj Electric Kettle 1.5L'
+        };
+
+        const CITY_STATE_MAP = {
+            'Mumbai': 'Maharashtra',
+            'Bangalore': 'Karnataka',
+            'Delhi': 'Delhi NCR',
+            'Hyderabad': 'Telangana',
+            'Chennai': 'Tamil Nadu',
+            'Kolkata': 'West Bengal'
+        };
+
+        // Generate deterministic balanced mock dataset
+        let rawTransactions = [];
+        function generateDataset() {
+            rawTransactions = [];
+            let id = 1000;
+
+            MONTHS.forEach((month, monthIdx) => {
+                // Seasonal sales factor (Peak in Dec, Oct, May)
+                let seasonalMultiplier = (month === 'Dec' || month === 'Oct') ? 1.6 : (month === 'May' ? 1.3 : 1.0);
+                let baseCount = Math.floor(180 * seasonalMultiplier);
+
+                for (let i = 0; i < baseCount; i++) {
+                    let city = CITIES[(i + monthIdx) % CITIES.length];
+                    let payment = PAYMENTS[(i * 3 + monthIdx) % PAYMENTS.length];
+                    let channel = CHANNELS[(i * 2 + monthIdx) % CHANNELS.length];
+                    let category = CATEGORIES[(i + monthIdx * 2) % CATEGORIES.length];
+                    let product = PRODUCTS_BY_CAT[category];
+                    let state = CITY_STATE_MAP[city];
+
+                    // Base values
+                    let basePrice = 0;
+                    if (category === 'Staples & FMCG') basePrice = 650;
+                    else if (category === 'Dairy & Fresh') basePrice = 280;
+                    else if (category === 'Home & Personal Care') basePrice = 490;
+                    else if (category === 'Apparel & Footwear') basePrice = 850;
+                    else if (category === 'Home Appliances') basePrice = 1650;
+
+                    let amount = Math.floor(basePrice + ((i % 5) * 40));
+                    let status = (i % 17 === 0) ? 'Cancelled' : 'Completed'; // ~6% cancellation rate
+
+                    rawTransactions.push({
+                        id: ++id,
+                        month: month,
+                        city: city,
+                        state: state,
+                        payment: payment,
+                        channel: channel,
+                        category: category,
+                        product: product,
+                        amount: amount,
+                        status: status
+                    });
+                }
+            });
+        }
+
+        // --- 2. GLOBAL ACTIVE FILTERS STATE ---
+        let activeFilters = {
+            city: 'ALL',
+            month: null,
+            payment: null,
+            channel: null,
+            category: null,
+            product: null,
+            funnelStage: null
+        };
+
+        // --- 3. CHART INSTANCES STORAGE ---
+        let chartInstances = {};
+
+        // --- 4. INITIALIZATION ON WINDOW LOAD ---
+        window.onload = function() {
+            setDynamicGreeting();
+            generateDataset();
+            
+            // Set up start button transition
+            document.getElementById('btn-start-dashboard').addEventListener('click', function() {
+                let landing = document.getElementById('landing-screen');
+                let mainDash = document.getElementById('main-dashboard');
+
+                landing.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    landing.classList.add('hidden');
+                    mainDash.classList.remove('hidden');
+                    
+                    // Render initial dashboard
+                    initAllCharts();
+                    updateDashboard();
+                }, 400);
+            });
+        };
+
+        // --- 5. TIME GREETING ---
+        function setDynamicGreeting() {
+            const hour = new Date().getHours();
+            let greeting = "Good Day!";
+            if (hour >= 5 && hour < 12) greeting = "Good Morning!";
+            else if (hour >= 12 && hour < 17) greeting = "Good Afternoon!";
+            else if (hour >= 17 && hour < 22) greeting = "Good Evening!";
+            else greeting = "Good Night!";
+
+            document.getElementById('landing-greeting').innerHTML = `${greeting} <br/><span class="text-emerald-400">D-Mart Executive BI</span>`;
+        }
+
+        // --- 6. TAB NAVIGATION ---
+        function switchTab(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.dashboard-page').forEach(page => page.classList.add('hidden'));
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected page & activate tab
+            document.getElementById(pageId).classList.remove('hidden');
+            document.getElementById('tab-' + pageId).classList.add('active');
+
+            // Resize charts to prevent canvas rendering issues
+            setTimeout(() => {
+                Object.values(chartInstances).forEach(chart => {
+                    if (chart) chart.resize();
+                });
+            }, 50);
+        }
+
+        // --- 7. FILTER RECURSIVE CALCULATOR ENGINE ---
+        function getFilteredData() {
+            return rawTransactions.filter(item => {
+                if (activeFilters.city !== 'ALL' && item.city !== activeFilters.city) return false;
+                if (activeFilters.month && item.month !== activeFilters.month) return false;
+                if (activeFilters.payment && item.payment !== activeFilters.payment) return false;
+                if (activeFilters.channel && item.channel !== activeFilters.channel) return false;
+                if (activeFilters.category && item.category !== activeFilters.category) return false;
+                if (activeFilters.product && item.product !== activeFilters.product) return false;
+                return true;
+            });
+        }
+
+        // --- 8. UPDATE ALL METRICS & CHARTS (POWER BI RECURSIVE LOOP) ---
+        function updateDashboard() {
+            const filteredData = getFilteredData();
+
+            // A. Update KPI Metrics
+            updateKPICards(filteredData);
+
+            // B. Update Filter Breadcrumb Badges
+            renderFilterBadges();
+
+            // C. Recalculate Chart Data and Repaint
+            updateMonthlyTrendChart(filteredData);
+            updateChannelsChart(filteredData);
+            updatePaymentsChart(filteredData);
+            updateCategoriesChart(filteredData);
+            updateStatesChart(filteredData);
+            updateProductsChart(filteredData);
+            updateFunnelChart(filteredData);
+        }
+
+        // --- 9. KPI CARDS UPDATER ---
+        function updateKPICards(data) {
+            const completed = data.filter(d => d.status === 'Completed');
+            const totalSales = completed.reduce((sum, d) => sum + d.amount, 0);
+            const totalOrders = completed.length;
+            const avgOrderValue = totalOrders > 0 ? Math.round(totalSales / totalOrders) : 0;
+            const cancelledCount = data.filter(d => d.status === 'Cancelled').length;
+            const cancelRate = data.length > 0 ? ((cancelledCount / data.length) * 100).toFixed(1) : '0.0';
+
+            // Animate / set values
+            document.getElementById('kpi-sales').textContent = '₹' + totalSales.toLocaleString('en-IN');
+            document.getElementById('kpi-orders').textContent = totalOrders.toLocaleString('en-IN');
+            document.getElementById('kpi-aov').textContent = '₹' + avgOrderValue.toLocaleString('en-IN');
+            document.getElementById('kpi-cancel').textContent = cancelRate + '%';
+
+            // Sub-text descriptions based on filter state
+            const isFiltered = Object.values(activeFilters).some(v => v !== null && v !== 'ALL');
+            document.getElementById('kpi-sales-sub').textContent = isFiltered ? 'Filtered Metric Context' : 'Full Dataset Context';
+            document.getElementById('kpi-orders-sub').textContent = isFiltered ? 'Filtered Volume' : 'Total System Volume';
+        }
+
+        // --- 10. RENDER ACTIVE FILTER BADGES ---
+        function renderFilterBadges() {
+            const container = document.getElementById('active-filters-badges');
+            container.innerHTML = '';
+
+            let hasFilters = false;
+
+            for (const [key, val] of Object.entries(activeFilters)) {
+                if (val && val !== 'ALL') {
+                    hasFilters = true;
+                    const badge = document.createElement('span');
+                    badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold';
+                    badge.innerHTML = `
+                        <span class="capitalize text-slate-400 font-normal">${key}:</span> ${val}
+                        <i class="fa-solid fa-xmark cursor-pointer hover:text-white ml-1" onclick="clearSpecificFilter('${key}')"></i>
+                    `;
+                    container.appendChild(badge);
+                }
+            }
+
+            if (!hasFilters) {
+                container.innerHTML = '<span class="text-slate-500 italic">None (Displaying Full Context)</span>';
+            }
+        }
+
+        // --- 11. FILTER ACTION HANDLERS ---
+        function toggleFilter(filterKey, value) {
+            if (activeFilters[filterKey] === value) {
+                // Clicking already selected filter resets it (Power BI behavior)
+                activeFilters[filterKey] = null;
+            } else {
+                activeFilters[filterKey] = value;
+            }
+            updateDashboard();
+        }
+
+        function clearSpecificFilter(key) {
+            if (key === 'city') {
+                activeFilters.city = 'ALL';
+                document.getElementById('city-selector').value = 'ALL';
+            } else {
+                activeFilters[key] = null;
+            }
+            updateDashboard();
+        }
+
+        function handleCityChange(val) {
+            activeFilters.city = val;
+            updateDashboard();
+        }
+
+        function resetAllFilters() {
+            activeFilters = {
+                city: 'ALL',
+                month: null,
+                payment: null,
+                channel: null,
+                category: null,
+                product: null,
+                funnelStage: null
+            };
+            document.getElementById('city-selector').value = 'ALL';
+            updateDashboard();
+        }
+
+        // --- 12. CHART INITIALIZATION AND UPDATES ---
+        
+        // Dynamic color styling helpers
+        function getBarColors(labels, activeVal, defaultColor, highlightColor) {
+            return labels.map(l => (activeVal && l === activeVal) ? highlightColor : (activeVal ? 'rgba(255,255,255,0.12)' : defaultColor));
+        }
+
+        function getPieColors(labels, activeVal, colorPalette) {
+            return labels.map((l, i) => {
+                if (!activeVal) return colorPalette[i % colorPalette.length];
+                return l === activeVal ? colorPalette[i % colorPalette.length] : 'rgba(255,255,255,0.1)';
+            });
+        }
+
+        function initAllCharts() {
+            Chart.defaults.font.family = 'Inter';
+            Chart.defaults.color = '#94a3b8';
+
+            // Chart 1: Monthly Trend (Combo Line/Column)
+            const ctxMonthly = document.getElementById('chart-monthly-trend').getContext('2d');
+            chartInstances.monthly = new Chart(ctxMonthly, {
+                type: 'bar',
+                data: {
+                    labels: MONTHS,
+                    datasets: [{
+                        label: 'Sales (₹)',
+                        data: [],
+                        backgroundColor: '#00d26a',
+                        borderRadius: 6,
+                        yAxisID: 'y'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const selectedMonth = MONTHS[index];
+                            toggleFilter('month', selectedMonth);
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` Sales: ₹${ctx.raw.toLocaleString('en-IN')}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { callback: (v) => '₹' + (v >= 1000 ? (v/1000) + 'k' : v) }
+                        }
+                    }
+                }
+            });
+
+            // Chart 2: Channels Doughnut Chart
+            const ctxChannels = document.getElementById('chart-channels').getContext('2d');
+            chartInstances.channels = new Chart(ctxChannels, {
+                type: 'doughnut',
+                data: {
+                    labels: CHANNELS,
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6'],
+                        borderWidth: 2,
+                        borderColor: '#0b0f17'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            toggleFilter('channel', CHANNELS[index]);
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } }
+                    }
+                }
+            });
+
+            // Chart 3: Payments Pie Chart
+            const ctxPayments = document.getElementById('chart-payments').getContext('2d');
+            chartInstances.payments = new Chart(ctxPayments, {
+                type: 'pie',
+                data: {
+                    labels: PAYMENTS,
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#a855f7', '#ec4899', '#f59e0b', '#06b6d4'],
+                        borderWidth: 2,
+                        borderColor: '#0b0f17'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            toggleFilter('payment', PAYMENTS[index]);
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } }
+                    }
+                }
+            });
+
+            // Chart 4: Categories Bar Chart
+            const ctxCategories = document.getElementById('chart-categories').getContext('2d');
+            chartInstances.categories = new Chart(ctxCategories, {
+                type: 'bar',
+                data: {
+                    labels: CATEGORIES,
+                    datasets: [{
+                        label: 'Category Revenue',
+                        data: [],
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            toggleFilter('category', CATEGORIES[index]);
+                        }
+                    },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 5: States Bar Chart
+            const ctxStates = document.getElementById('chart-states').getContext('2d');
+            const stateLabels = Array.from(new Set(Object.values(CITY_STATE_MAP)));
+            chartInstances.states = new Chart(ctxStates, {
+                type: 'bar',
+                data: {
+                    labels: stateLabels,
+                    datasets: [{
+                        label: 'State Revenue',
+                        data: [],
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const stateName = stateLabels[index];
+                            // Find corresponding city or filter directly
+                            const matchedCity = Object.keys(CITY_STATE_MAP).find(key => CITY_STATE_MAP[key] === stateName);
+                            if (matchedCity) toggleFilter('city', matchedCity);
+                        }
+                    },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+
+            // Chart 6: Products Leaderboard Bar Chart
+            const ctxProducts = document.getElementById('chart-products').getContext('2d');
+            const productList = Object.values(PRODUCTS_BY_CAT);
+            chartInstances.products = new Chart(ctxProducts, {
+                type: 'bar',
+                data: {
+                    labels: productList,
+                    datasets: [{
+                        label: 'Product Sales',
+                        data: [],
+                        backgroundColor: '#eab308',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            toggleFilter('product', productList[index]);
+                        }
+                    },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Chart 7: Funnel Chart
+            const ctxFunnel = document.getElementById('chart-funnel').getContext('2d');
+            chartInstances.funnel = new Chart(ctxFunnel, {
+                type: 'bar',
+                data: {
+                    labels: ['Store Impressions', 'Product Views', 'Added to Basket', 'Completed Checkout'],
+                    datasets: [{
+                        label: 'Customers',
+                        data: [],
+                        backgroundColor: ['#06b6d4', '#3b82f6', '#8b5cf6', '#10b981'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        // --- 13. INDIVIDUAL CHART DATA CALCULATORS ---
+
+        function updateMonthlyTrendChart(data) {
+            const monthlySums = MONTHS.map(m => {
+                return data.filter(d => d.month === m && d.status === 'Completed')
+                           .reduce((sum, d) => sum + d.amount, 0);
+            });
+
+            chartInstances.monthly.data.datasets[0].data = monthlySums;
+            chartInstances.monthly.data.datasets[0].backgroundColor = getBarColors(MONTHS, activeFilters.month, '#00d26a', '#00ff80');
+            chartInstances.monthly.update();
+        }
+
+        function updateChannelsChart(data) {
+            const sums = CHANNELS.map(ch => {
+                return data.filter(d => d.channel === ch && d.status === 'Completed')
+                           .reduce((sum, d) => sum + d.amount, 0);
+            });
+
+            const palette = ['#3b82f6', '#10b981', '#8b5cf6'];
+            chartInstances.channels.data.datasets[0].data = sums;
+            chartInstances.channels.data.datasets[0].backgroundColor = getPieColors(CHANNELS, activeFilters.channel, palette);
+            chartInstances.channels.update();
+        }
+
+        function updatePaymentsChart(data) {
+            const sums = PAYMENTS.map(p => {
+                return data.filter(d => d.payment === p && d.status === 'Completed')
+                           .reduce((sum, d) => sum + d.amount, 0);
+            });
+
+            const palette = ['#a855f7', '#ec4899', '#f59e0b', '#06b6d4'];
+            chartInstances.payments.data.datasets[0].data = sums;
+            chartInstances.payments.data.datasets[0].backgroundColor = getPieColors(PAYMENTS, activeFilters.payment, palette);
+            chartInstances.payments.update();
+        }
+
+        function updateCategoriesChart(data) {
+            const sums = CATEGORIES.map(c => {
+                return data.filter(d => d.category === c && d.status === 'Completed')
+                           .reduce((sum, d) => sum + d.amount, 0);
+            });
+
+            chartInstances.categories.data.datasets[0].data = sums;
+            chartInstances.categories.data.datasets[0].backgroundColor = getBarColors(CATEGORIES, activeFilters.category, '#f59e0b', '#fbbf24');
+            chartInstances.categories.update();
+        }
+
+        function updateStatesChart(data) {
+            const stateLabels = Array.from(new Set(Object.values(CITY_STATE_MAP)));
+            const sums = stateLabels.map(st => {
+                return data.filter(d => d.state === st && d.status === 'Completed')
+                           .reduce((sum, d) => sum + d.amount, 0);
+            });
+
+            const activeState = activeFilters.city !== 'ALL' ? CITY_STATE_MAP[activeFilters.city] : null;
+            chartInstances.states.data.datasets[0].data = sums;
+            chartInstances.states.data.datasets[0].backgroundColor = getBarColors(stateLabels, activeState, '#10b981', '#34d399');
+            chartInstances.states.update();
+        }
+
+        function updateProductsChart(data) {
+            const productList = Object.values(PRODUCTS_BY_CAT);
+            const sums = productList.map(pr => {
+                return data.filter(d => d.product === pr && d.status === 'Completed')
+                           .reduce((sum, d) => sum + d.amount, 0);
+            });
+
+            chartInstances.products.data.datasets[0].data = sums;
+            chartInstances.products.data.datasets[0].backgroundColor = getBarColors(productList, activeFilters.product, '#eab308', '#fde047');
+            chartInstances.products.update();
+        }
+
+        function updateFunnelChart(data) {
+            const completedCount = data.filter(d => d.status === 'Completed').length;
+            const impressions = Math.round(completedCount * 2.8);
+            const views = Math.round(completedCount * 1.9);
+            const addedToBasket = Math.round(completedCount * 1.35);
+
+            chartInstances.funnel.data.datasets[0].data = [impressions, views, addedToBasket, completedCount];
+            chartInstances.funnel.update();
+        }
+    </script>
+</body>
+</html>
+```
